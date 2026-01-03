@@ -1,11 +1,20 @@
 [
     {
-        "label": "os",
+        "label": "argparse",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "os",
-        "description": "os",
-        "detail": "os",
+        "importPath": "argparse",
+        "description": "argparse",
+        "detail": "argparse",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
         "documentation": {}
     },
     {
@@ -24,6 +33,47 @@
         "importPath": "yaml",
         "description": "yaml",
         "detail": "yaml",
+        "documentation": {}
+    },
+    {
+        "label": "Parser",
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "isExtraImport": true,
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "FileType",
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "isExtraImport": true,
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "isExtraImport": true,
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
         "documentation": {}
     },
     {
@@ -124,30 +174,6 @@
         "documentation": {}
     },
     {
-        "label": "*",
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "isExtraImport": true,
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "*",
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "isExtraImport": true,
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "FileType",
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "isExtraImport": true,
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
         "label": "Enum",
         "importPath": "enum",
         "description": "enum",
@@ -180,53 +206,19 @@
         "documentation": {}
     },
     {
-        "label": "argparse",
-        "kind": 6,
+        "label": "Token",
+        "importPath": "core.lexer",
+        "description": "core.lexer",
         "isExtraImport": true,
-        "importPath": "argparse",
-        "description": "argparse",
-        "detail": "argparse",
+        "detail": "core.lexer",
         "documentation": {}
     },
     {
-        "label": "sys",
-        "kind": 6,
+        "label": "TokenType",
+        "importPath": "core.lexer",
+        "description": "core.lexer",
         "isExtraImport": true,
-        "importPath": "sys",
-        "description": "sys",
-        "detail": "sys",
-        "documentation": {}
-    },
-    {
-        "label": "FSConfig",
-        "importPath": "core.config",
-        "description": "core.config",
-        "isExtraImport": true,
-        "detail": "core.config",
-        "documentation": {}
-    },
-    {
-        "label": "FileSystemGenerator",
-        "importPath": "core.generator.generator",
-        "description": "core.generator.generator",
-        "isExtraImport": true,
-        "detail": "core.generator.generator",
-        "documentation": {}
-    },
-    {
-        "label": "Lexer",
-        "importPath": "core.parser.lexer",
-        "description": "core.parser.lexer",
-        "isExtraImport": true,
-        "detail": "core.parser.lexer",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
+        "detail": "core.lexer",
         "documentation": {}
     },
     {
@@ -238,128 +230,11 @@
         "documentation": {}
     },
     {
-        "label": "FileSystemGenerator",
-        "kind": 6,
-        "importPath": "core.generator.generator",
-        "description": "core.generator.generator",
-        "peekOfCode": "class FileSystemGenerator:\n    def __init__(self, base_path: str = \".\", config: Dict[str, Any] = None):\n        self.base_path = base_path\n        self.config = config or {}\n        self.variables = {}\n        self.file_contents = self.config.get('file_contents', {})\n        self.templates = self.config.get('templates', {})\n    def generate(self, nodes: List[ASTNode]):\n        os.makedirs(self.base_path, exist_ok=True)\n        for node in nodes:",
-        "detail": "core.generator.generator",
-        "documentation": {}
-    },
-    {
-        "label": "TemplateEngine",
-        "kind": 6,
-        "importPath": "core.generator.templates",
-        "description": "core.generator.templates",
-        "peekOfCode": "class TemplateEngine:\n    \"\"\"Движок шаблонов для более сложных подстановок\"\"\"\n    @staticmethod\n    def render(template: str, context: Dict[str, Any]) -> str:\n        \"\"\"Рендеринг шаблона с контекстом\"\"\"\n        import re\n        # Подстановка переменных ${var}\n        for key, value in context.items():\n            placeholder = r'\\$\\{' + re.escape(str(key)) + r'\\}'\n            template = re.sub(placeholder, str(value), template)",
-        "detail": "core.generator.templates",
-        "documentation": {}
-    },
-    {
-        "label": "AdvancedFileSystemGenerator",
-        "kind": 6,
-        "importPath": "core.generator.templates",
-        "description": "core.generator.templates",
-        "peekOfCode": "class AdvancedFileSystemGenerator(FileSystemGenerator):\n    \"\"\"Расширенный генератор с поддержкой шаблонов\"\"\"\n    def _generate_file(self, node: FileNode, current_path: str):\n        \"\"\"Расширенная генерация файла с поддержкой шаблонов\"\"\"\n        # Рендерим имя файла\n        file_name = TemplateEngine.render(node.name, self.variables)\n        path = os.path.join(current_path, file_name)\n        # Проверяем атрибуты\n        replace_if_exists = node.attributes.get('replaceifexists', True)\n        if os.path.exists(path) and not replace_if_exists:",
-        "detail": "core.generator.templates",
-        "documentation": {}
-    },
-    {
-        "label": "TokenType",
-        "kind": 6,
-        "importPath": "core.parser.lexer",
-        "description": "core.parser.lexer",
-        "peekOfCode": "class TokenType(Enum):\n    # Ключевые слова\n    FOLDER = \"FOLDER\"\n    FILE = \"FILE\"\n    FOR = \"FOR\"\n    IF = \"IF\"\n    ELSE = \"ELSE\"\n    # Идентификаторы и литералы\n    IDENTIFIER = \"IDENTIFIER\"\n    STRING = \"STRING\"",
-        "detail": "core.parser.lexer",
-        "documentation": {}
-    },
-    {
-        "label": "Token",
-        "kind": 6,
-        "importPath": "core.parser.lexer",
-        "description": "core.parser.lexer",
-        "peekOfCode": "class Token:\n    def __init__(self, type: TokenType, value: str = \"\", line: int = 1, column: int = 1):\n        self.type = type\n        self.value = value\n        self.line = line\n        self.column = column\n    def __repr__(self):\n        return f\"Token({self.type}, '{self.value}', line={self.line})\"\nclass Lexer:\n    def __init__(self, text: str):",
-        "detail": "core.parser.lexer",
-        "documentation": {}
-    },
-    {
-        "label": "Lexer",
-        "kind": 6,
-        "importPath": "core.parser.lexer",
-        "description": "core.parser.lexer",
-        "peekOfCode": "class Lexer:\n    def __init__(self, text: str):\n        self.text = text\n        self.pos = 0\n        self.line = 1\n        self.line_start = 0\n        self.tokens: List[Token] = []\n        # Ключевые слова\n        self.keywords = {\n            'folder': TokenType.FOLDER,",
-        "detail": "core.parser.lexer",
-        "documentation": {}
-    },
-    {
-        "label": "FileType",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class FileType(PyEnum):\n    TEXT = \"text\"\n    BINARY = \"binary\"\n    JSON = \"json\"\n    YAML = \"yaml\"\n    XML = \"xml\"\nclass Permission(PyEnum):\n    READ_ONLY = \"444\"\n    WRITABLE = \"644\"\n    EXECUTABLE = \"755\"",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "Permission",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class Permission(PyEnum):\n    READ_ONLY = \"444\"\n    WRITABLE = \"644\"\n    EXECUTABLE = \"755\"\n    FULL = \"777\"\n@dataclass\nclass ASTNode:\n    line: int = 0\n    column: int = 0\n@dataclass",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "ASTNode",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class ASTNode:\n    line: int = 0\n    column: int = 0\n@dataclass\nclass FileNode(ASTNode):\n    name: str = \"\"\n    attributes: Dict[str, Any] = field(default_factory=dict)\n    template_vars: Dict[str, str] = field(default_factory=dict)\n@dataclass\nclass FolderNode(ASTNode):",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "FileNode",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class FileNode(ASTNode):\n    name: str = \"\"\n    attributes: Dict[str, Any] = field(default_factory=dict)\n    template_vars: Dict[str, str] = field(default_factory=dict)\n@dataclass\nclass FolderNode(ASTNode):\n    name: str = \"\"\n    children: List[ASTNode] = field(default_factory=list)\n    attributes: Dict[str, Any] = field(default_factory=dict)\n@dataclass",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "FolderNode",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class FolderNode(ASTNode):\n    name: str = \"\"\n    children: List[ASTNode] = field(default_factory=list)\n    attributes: Dict[str, Any] = field(default_factory=dict)\n@dataclass\nclass ForLoopNode(ASTNode):\n    var_name: str = \"\"\n    start: Any = 0\n    end: Any = 0\n    step: Any = 1",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "ForLoopNode",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class ForLoopNode(ASTNode):\n    var_name: str = \"\"\n    start: Any = 0\n    end: Any = 0\n    step: Any = 1\n    condition: str = \"<\"\n    children: List[ASTNode] = field(default_factory=list)\nclass Parser:\n    def __init__(self, tokens: List[Token]):\n        self.tokens = tokens",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
-        "label": "Parser",
-        "kind": 6,
-        "importPath": "core.parser.parser",
-        "description": "core.parser.parser",
-        "peekOfCode": "class Parser:\n    def __init__(self, tokens: List[Token]):\n        self.tokens = tokens\n        self.pos = 0\n        self.current_token = tokens[0] if tokens else None\n    def error(self, message: str):\n        token = self.current_token\n        raise SyntaxError(f\"{message} на строке {token.line}, позиция {token.column}\")\n    def eat(self, token_type: TokenType, value: Optional[str] = None):\n        if self.current_token.type == token_type:",
-        "detail": "core.parser.parser",
-        "documentation": {}
-    },
-    {
         "label": "FSBuilderCLI",
         "kind": 6,
         "importPath": "core.cli",
         "description": "core.cli",
-        "peekOfCode": "class FSBuilderCLI:\n    \"\"\"Интерфейс командной строки\"\"\"\n    @staticmethod\n    def build_from_dsl(dsl_text: str, output_dir: str = \".\", config_file: str = None):\n        \"\"\"Построение из DSL текста\"\"\"\n        # Загрузка конфигурации\n        config = {}\n        if config_file:\n            fs_config = FSConfig()\n            fs_config.load_from_file(config_file)",
+        "peekOfCode": "class FSBuilderCLI:\n    \"\"\"Command Line Interface for File System Builder\"\"\"\n    @staticmethod\n    def _execute_dsl(dsl_text: str, output_dir: str = \".\", config: dict = None, verbose: bool = False):\n        \"\"\"Execute STTFS code\"\"\"\n        from core.lexer import Lexer\n        from core.parser import Parser\n        from core.generator import InteractiveFSGenerator\n        lexer = Lexer(dsl_text)\n        tokens = lexer.tokenize()",
         "detail": "core.cli",
         "documentation": {}
     },
@@ -370,6 +245,132 @@
         "description": "core.config",
         "peekOfCode": "class FSConfig:\n    \"\"\"Конфигурация для генерации файловой системы\"\"\"\n    def __init__(self):\n        self.file_contents = {}\n        self.templates = {}\n        self.defaults = {\n            'encoding': 'utf-8',\n            'replaceifexists': True,\n            'type': FileType.TEXT,\n            'permissions': '644',",
         "detail": "core.config",
+        "documentation": {}
+    },
+    {
+        "label": "InteractiveFSGenerator",
+        "kind": 6,
+        "importPath": "core.generator",
+        "description": "core.generator",
+        "peekOfCode": "class InteractiveFSGenerator:\n    def __init__(self, base_path: str = \".\", config: Dict[str, Any] = None):\n        self.base_path = base_path\n        self.config = config or {}\n        self.variables = {}\n        self.file_contents = self.config.get('file_contents', {})\n        self.templates = self.config.get('templates', {})\n        # Add system variables\n        self.variables['date'] = datetime.now().strftime(\"%Y-%m-%d\")\n        self.variables['time'] = datetime.now().strftime(\"%H:%M:%S\")",
+        "detail": "core.generator",
+        "documentation": {}
+    },
+    {
+        "label": "TokenType",
+        "kind": 6,
+        "importPath": "core.lexer",
+        "description": "core.lexer",
+        "peekOfCode": "class TokenType(Enum):\n    FOLDER = \"FOLDER\"\n    FILE = \"FILE\"\n    FOR = \"FOR\"\n    IF = \"IF\"\n    ELSE = \"ELSE\"\n    STDOUT = \"STDOUT\"\n    STDIN = \"STDIN\"\n    IDENTIFIER = \"IDENTIFIER\"\n    STRING = \"STRING\"",
+        "detail": "core.lexer",
+        "documentation": {}
+    },
+    {
+        "label": "Token",
+        "kind": 6,
+        "importPath": "core.lexer",
+        "description": "core.lexer",
+        "peekOfCode": "class Token:\n    def __init__(self, type: TokenType, value: str = \"\", line: int = 1, column: int = 1):\n        self.type = type\n        self.value = value\n        self.line = line\n        self.column = column\n    def __repr__(self):\n        return f\"Token({self.type}, '{self.value}', line={self.line})\"\nclass Lexer:\n    def __init__(self, text: str):",
+        "detail": "core.lexer",
+        "documentation": {}
+    },
+    {
+        "label": "Lexer",
+        "kind": 6,
+        "importPath": "core.lexer",
+        "description": "core.lexer",
+        "peekOfCode": "class Lexer:\n    def __init__(self, text: str):\n        self.text = text\n        self.pos = 0\n        self.line = 1\n        self.line_start = 0\n        self.tokens: List[Token] = []\n        self.keywords = {\n            'folder': TokenType.FOLDER,\n            'file': TokenType.FILE,",
+        "detail": "core.lexer",
+        "documentation": {}
+    },
+    {
+        "label": "FileType",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class FileType(PyEnum):\n    TEXT = \"text\"\n    BINARY = \"binary\"\n    JSON = \"json\"\n    YAML = \"yaml\"\n    XML = \"xml\"\nclass Permission(PyEnum):\n    READ_ONLY = \"444\"\n    WRITABLE = \"644\"\n    EXECUTABLE = \"755\"",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "Permission",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class Permission(PyEnum):\n    READ_ONLY = \"444\"\n    WRITABLE = \"644\"\n    EXECUTABLE = \"755\"\n    FULL = \"777\"\n@dataclass\nclass ASTNode:\n    line: int = 0\n    column: int = 0\n@dataclass",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "ASTNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class ASTNode:\n    line: int = 0\n    column: int = 0\n@dataclass\nclass FileNode(ASTNode):\n    name: str = \"\"\n    attributes: Dict[str, Any] = field(default_factory=dict)\n    template_vars: Dict[str, str] = field(default_factory=dict)\n@dataclass\nclass FolderNode(ASTNode):",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "FileNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class FileNode(ASTNode):\n    name: str = \"\"\n    attributes: Dict[str, Any] = field(default_factory=dict)\n    template_vars: Dict[str, str] = field(default_factory=dict)\n@dataclass\nclass FolderNode(ASTNode):\n    name: str = \"\"\n    children: List[ASTNode] = field(default_factory=list)\n    attributes: Dict[str, Any] = field(default_factory=dict)\n@dataclass",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "FolderNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class FolderNode(ASTNode):\n    name: str = \"\"\n    children: List[ASTNode] = field(default_factory=list)\n    attributes: Dict[str, Any] = field(default_factory=dict)\n@dataclass\nclass ForLoopNode(ASTNode):\n    var_name: str = \"\"\n    start: Any = 0\n    end: Any = 0\n    step: Any = 1",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "ForLoopNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class ForLoopNode(ASTNode):\n    var_name: str = \"\"\n    start: Any = 0\n    end: Any = 0\n    step: Any = 1\n    condition: str = \"<\"\n    children: List[ASTNode] = field(default_factory=list)\n@dataclass\nclass OutputNode(ASTNode):\n    message: str = \"\"",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "OutputNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class OutputNode(ASTNode):\n    message: str = \"\"\n@dataclass\nclass InputNode(ASTNode):\n    variable: str = \"\"\nclass Parser:\n    def __init__(self, tokens: List[Token]):\n        self.tokens = tokens\n        self.pos = 0\n        self.current_token = tokens[0] if tokens else None",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "InputNode",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class InputNode(ASTNode):\n    variable: str = \"\"\nclass Parser:\n    def __init__(self, tokens: List[Token]):\n        self.tokens = tokens\n        self.pos = 0\n        self.current_token = tokens[0] if tokens else None\n    def error(self, message: str):\n        token = self.current_token\n        raise SyntaxError(f\"{message} at line {token.line}, position {token.column}\")",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "Parser",
+        "kind": 6,
+        "importPath": "core.parser",
+        "description": "core.parser",
+        "peekOfCode": "class Parser:\n    def __init__(self, tokens: List[Token]):\n        self.tokens = tokens\n        self.pos = 0\n        self.current_token = tokens[0] if tokens else None\n    def error(self, message: str):\n        token = self.current_token\n        raise SyntaxError(f\"{message} at line {token.line}, position {token.column}\")\n    def eat(self, token_type: TokenType, value: Optional[str] = None):\n        if self.current_token.type == token_type:",
+        "detail": "core.parser",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "def main():\n    \"\"\"Main entry point\"\"\"\n    if len(sys.argv) > 1:\n        FSBuilderCLI.main()\n    else:\n        # Show help if no arguments\n        FSBuilderCLI.main()\nif __name__ == \"__main__\":\n    main()",
+        "detail": "main",
         "documentation": {}
     }
 ]

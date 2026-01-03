@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, Union
 from enum import Enum as PyEnum
-from .lexer import Token, TokenType
+from core.lexer import Token, TokenType
 
 class FileType(PyEnum):
     TEXT = "text"
@@ -42,6 +42,14 @@ class ForLoopNode(ASTNode):
     condition: str = "<"
     children: List[ASTNode] = field(default_factory=list)
 
+@dataclass
+class OutputNode(ASTNode):
+    message: str = ""
+
+@dataclass
+class InputNode(ASTNode):
+    variable: str = ""
+
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
@@ -50,19 +58,19 @@ class Parser:
     
     def error(self, message: str):
         token = self.current_token
-        raise SyntaxError(f"{message} на строке {token.line}, позиция {token.column}")
+        raise SyntaxError(f"{message} at line {token.line}, position {token.column}")
     
     def eat(self, token_type: TokenType, value: Optional[str] = None):
         if self.current_token.type == token_type:
             if value is not None and self.current_token.value != value:
-                self.error(f"Ожидалось '{value}', получено '{self.current_token.value}'")
+                self.error(f"Expected '{value}', got '{self.current_token.value}'")
             self.pos += 1
             if self.pos < len(self.tokens):
                 self.current_token = self.tokens[self.pos]
             else:
                 self.current_token = Token(TokenType.EOF, "")
         else:
-            self.error(f"Ожидался токен {token_type}, получен {self.current_token.type}")
+            self.error(f"Expected token {token_type}, got {self.current_token.type}")
     
     def peek(self, offset: int = 1) -> Optional[Token]:
         if self.pos + offset < len(self.tokens):
@@ -86,25 +94,50 @@ class Parser:
             return self.parse_file()
         elif token.type == TokenType.FOR:
             return self.parse_for_loop()
+        elif token.type == TokenType.STDOUT:
+            return self.parse_output()
+        elif token.type == TokenType.STDIN:
+            return self.parse_input()
         
-        self.error(f"Неожиданный токен: {token}")
+        self.error(f"Unexpected token: {token}")
+    
+    def parse_output(self) -> OutputNode:
+        self.eat(TokenType.STDOUT)
+        self.eat(TokenType.LSHIFT)
+        
+        if self.current_token.type != TokenType.STRING:
+            self.error("Expected string after <<")
+        
+        message = self.current_token.value
+        self.eat(TokenType.STRING)
+        
+        return OutputNode(message=message)
+    
+    def parse_input(self) -> InputNode:
+        self.eat(TokenType.STDIN)
+        self.eat(TokenType.RSHIFT)
+        
+        if self.current_token.type != TokenType.IDENTIFIER:
+            self.error("Expected variable identifier after >>")
+        
+        variable = self.current_token.value
+        self.eat(TokenType.IDENTIFIER)
+        
+        return InputNode(variable=variable)
     
     def parse_folder(self) -> FolderNode:
         self.eat(TokenType.FOLDER)
         
-        # Имя
         if self.current_token.type in [TokenType.IDENTIFIER, TokenType.STRING]:
             name = self.current_token.value
             self.eat(self.current_token.type)
         else:
-            self.error("Ожидалось имя папки")
+            self.error("Expected folder name")
         
-        # Атрибуты
         attributes = {}
         if self.current_token.type == TokenType.LPAREN:
             attributes = self.parse_attributes()
         
-        # Тело
         self.eat(TokenType.LBRACE)
         
         children = []
@@ -119,71 +152,60 @@ class Parser:
     def parse_file(self) -> FileNode:
         self.eat(TokenType.FILE)
         
-        # Имя
         if self.current_token.type in [TokenType.IDENTIFIER, TokenType.STRING]:
             name = self.current_token.value
             self.eat(self.current_token.type)
         else:
-            self.error("Ожидалось имя файла")
+            self.error("Expected file name")
         
-        # Атрибуты
         attributes = {}
         if self.current_token.type == TokenType.LPAREN:
             attributes = self.parse_attributes()
         
-        # Извлекаем переменные шаблона
         template_vars = self._extract_template_vars(name)
         
         return FileNode(name=name, attributes=attributes, template_vars=template_vars)
     
     def parse_for_loop(self) -> ForLoopNode:
         self.eat(TokenType.FOR)
-        
         self.eat(TokenType.LBRACKET)
         
-        # Переменная и начальное значение
         if self.current_token.type != TokenType.IDENTIFIER:
-            self.error("Ожидалось имя переменной цикла")
+            self.error("Expected loop variable name")
         var_name = self.current_token.value
         self.eat(TokenType.IDENTIFIER)
         
         self.eat(TokenType.ASSIGN)
         
-        # Начальное значение
         if self.current_token.type == TokenType.NUMBER:
             start = int(self.current_token.value)
             self.eat(TokenType.NUMBER)
         else:
-            self.error("Ожидалось числовое начальное значение")
+            self.error("Expected numeric start value")
         
         self.eat(TokenType.SEMICOLON)
         
-        # Условие
         if self.current_token.type != TokenType.IDENTIFIER or self.current_token.value != var_name:
-            self.error(f"Ожидалась переменная цикла '{var_name}'")
+            self.error(f"Expected loop variable '{var_name}'")
         self.eat(TokenType.IDENTIFIER)
         
-        # Оператор сравнения
         condition_op = self.current_token.value
         if condition_op not in ['<', '<=', '>', '>=', '!=']:
-            self.error(f"Неподдерживаемый оператор сравнения: {condition_op}")
+            self.error(f"Unsupported comparison operator: {condition_op}")
         self.eat(self.current_token.type)
         
-        # Конечное значение
         if self.current_token.type == TokenType.NUMBER:
             end = int(self.current_token.value)
             self.eat(TokenType.NUMBER)
         else:
-            self.error("Ожидалось числовое конечное значение")
+            self.error("Expected numeric end value")
         
         self.eat(TokenType.SEMICOLON)
         
-        # Шаг цикла
         if self.current_token.type != TokenType.IDENTIFIER or self.current_token.value != var_name:
-            self.error(f"Ожидалась переменная цикла '{var_name}'")
+            self.error(f"Expected loop variable '{var_name}'")
         self.eat(TokenType.IDENTIFIER)
         
-        # Оператор инкремента
         step = 1
         if self.current_token.type == TokenType.INCR:
             step = 1
@@ -192,11 +214,9 @@ class Parser:
             step = -1
             self.eat(TokenType.DECR)
         else:
-            self.error("Ожидался оператор инкремента")
+            self.error("Expected increment/decrement operator")
         
         self.eat(TokenType.RBRACKET)
-        
-        # Тело цикла
         self.eat(TokenType.LBRACE)
         
         children = []
@@ -215,19 +235,16 @@ class Parser:
         attributes = {}
         
         while self.current_token.type != TokenType.RPAREN:
-            # Имя атрибута
             if self.current_token.type != TokenType.IDENTIFIER:
-                self.error("Ожидалось имя атрибута")
+                self.error("Expected attribute name")
             attr_name = self.current_token.value
             self.eat(TokenType.IDENTIFIER)
             
             self.eat(TokenType.ASSIGN)
             
-            # Значение атрибута
             attr_value = self.parse_attribute_value()
             attributes[attr_name] = attr_value
             
-            # Проверяем, есть ли следующий атрибут
             if self.current_token.type == TokenType.COMMA:
                 self.eat(TokenType.COMMA)
         
@@ -238,7 +255,6 @@ class Parser:
         if self.current_token.type == TokenType.STRING:
             value = self.current_token.value
             self.eat(TokenType.STRING)
-            # Проверяем специальные строковые значения
             if value.lower() in ["text", "binary", "json", "yaml", "xml"]:
                 return FileType(value.lower())
             elif value in ["444", "644", "755", "777"]:
@@ -257,12 +273,11 @@ class Parser:
                 self.eat(TokenType.IDENTIFIER)
                 return None
             else:
-                # Это может быть имя другой переменной или константы
                 value = self.current_token.value
                 self.eat(TokenType.IDENTIFIER)
                 return value
         else:
-            self.error("Неподдерживаемый тип значения атрибута")
+            self.error("Unsupported attribute value type")
     
     def _extract_template_vars(self, text: str) -> Dict[str, str]:
         import re

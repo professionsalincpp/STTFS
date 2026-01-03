@@ -3,19 +3,16 @@ from enum import Enum
 from typing import List, Optional
 
 class TokenType(Enum):
-    # Ключевые слова
     FOLDER = "FOLDER"
     FILE = "FILE"
     FOR = "FOR"
     IF = "IF"
     ELSE = "ELSE"
-    
-    # Идентификаторы и литералы
+    STDOUT = "STDOUT"
+    STDIN = "STDIN"
     IDENTIFIER = "IDENTIFIER"
     STRING = "STRING"
     NUMBER = "NUMBER"
-    
-    # Операторы
     ASSIGN = "ASSIGN"
     EQ = "EQ"
     NE = "NE"
@@ -30,8 +27,8 @@ class TokenType(Enum):
     MOD = "MOD"
     INCR = "INCR"
     DECR = "DECR"
-    
-    # Скобки и разделители
+    LSHIFT = "LSHIFT"
+    RSHIFT = "RSHIFT"
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
     LBRACE = "LBRACE"
@@ -41,8 +38,6 @@ class TokenType(Enum):
     COMMA = "COMMA"
     COLON = "COLON"
     SEMICOLON = "SEMICOLON"
-    
-    # Специальные
     TEMPLATE_VAR = "TEMPLATE_VAR"
     EOF = "EOF"
 
@@ -64,19 +59,19 @@ class Lexer:
         self.line_start = 0
         self.tokens: List[Token] = []
         
-        # Ключевые слова
         self.keywords = {
             'folder': TokenType.FOLDER,
             'file': TokenType.FILE,
             'for': TokenType.FOR,
             'if': TokenType.IF,
             'else': TokenType.ELSE,
+            'stdout': TokenType.STDOUT,
+            'stdin': TokenType.STDIN,
             'true': TokenType.IDENTIFIER,
             'false': TokenType.IDENTIFIER,
             'null': TokenType.IDENTIFIER,
         }
         
-        # Операторы
         self.operators = {
             '=': TokenType.ASSIGN,
             '==': TokenType.EQ,
@@ -92,6 +87,8 @@ class Lexer:
             '%': TokenType.MOD,
             '++': TokenType.INCR,
             '--': TokenType.DECR,
+            '<<': TokenType.LSHIFT,
+            '>>': TokenType.RSHIFT,
             '(': TokenType.LPAREN,
             ')': TokenType.RPAREN,
             '{': TokenType.LBRACE,
@@ -111,32 +108,26 @@ class Lexer:
             
             char = self.text[self.pos]
             
-            # Комментарии
             if char == '#':
                 self._read_comment()
                 continue
             
-            # Строки в двойных кавычках
             if char == '"':
                 self._read_string()
                 continue
             
-            # Числа
             if char.isdigit():
                 self._read_number()
                 continue
             
-            # Переменные шаблона ${var}
             if char == '$' and self.pos + 1 < len(self.text) and self.text[self.pos + 1] == '{':
                 self._read_template_var()
                 continue
             
-            # Идентификаторы и ключевые слова
             if char.isalpha() or char == '_':
                 self._read_identifier()
                 continue
             
-            # Операторы
             if self._read_operator():
                 continue
             
@@ -153,12 +144,11 @@ class Lexer:
             self.pos += 1
     
     def _read_comment(self):
-        start = self.pos
         while self.pos < len(self.text) and self.text[self.pos] != '\n':
             self.pos += 1
     
     def _read_string(self):
-        self.pos += 1  # Пропускаем открывающую кавычку
+        self.pos += 1
         start = self.pos
         while self.pos < len(self.text):
             if self.text[self.pos] == '"':
@@ -167,10 +157,10 @@ class Lexer:
                 self.pos += 1
                 return
             elif self.text[self.pos] == '\\' and self.pos + 1 < len(self.text):
-                self.pos += 2  # Пропускаем escape-символ
+                self.pos += 2
             else:
                 self.pos += 1
-        raise SyntaxError(f"Незакрытая строка на строке {self.line}")
+        raise SyntaxError(f"Unclosed string at line {self.line}")
     
     def _read_number(self):
         start = self.pos
@@ -181,7 +171,7 @@ class Lexer:
     
     def _read_template_var(self):
         start = self.pos
-        self.pos += 2  # Пропускаем ${
+        self.pos += 2
         depth = 1
         content_start = self.pos
         
@@ -193,7 +183,7 @@ class Lexer:
             self.pos += 1
         
         if depth > 0:
-            raise SyntaxError(f"Незакрытая переменная шаблона на строке {self.line}")
+            raise SyntaxError(f"Unclosed template variable at line {self.line}")
         
         content = self.text[content_start:self.pos-1].strip()
         self.tokens.append(Token(TokenType.TEMPLATE_VAR, content, self.line, start - self.line_start + 1))
@@ -208,7 +198,6 @@ class Lexer:
         self.tokens.append(Token(token_type, value, self.line, start - self.line_start + 1))
     
     def _read_operator(self) -> bool:
-        # Пробуем найти самый длинный оператор
         for length in [2, 1]:
             if self.pos + length <= len(self.text):
                 op = self.text[self.pos:self.pos+length]

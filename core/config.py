@@ -2,7 +2,7 @@ import json
 import yaml
 from pathlib import Path
 
-from core.parser.parser import FileType
+from core.parser import FileType
 
 class FSConfig:
     """Конфигурация для генерации файловой системы"""
